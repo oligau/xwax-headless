@@ -131,6 +131,11 @@ static void usage(FILE *fd)
       "  --dicer <dev>   Novation Dicer\n\n");
 #endif
 
+#ifdef WITH_OSC
+    fprintf(fd, "OSC support:\n"
+      "  --osc           Switch on open sound control\n\n");
+#endif
+
     fprintf(fd,
       "The ordering of options is important. Options apply to subsequent\n"
       "music libraries or decks, which can be given multiple times. See the\n"
