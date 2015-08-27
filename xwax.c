@@ -42,6 +42,10 @@
 #include "track.h"
 #include "xwax.h"
 
+#ifdef WITH_OSC
+#include "osc.h"
+#endif
+
 #define DEFAULT_OSS_BUFFERS 8
 #define DEFAULT_OSS_FRAGMENT 7
 
@@ -165,7 +169,7 @@ static int commit_deck(void)
 
     d = &deck[ndeck];
 
-    r = deck_init(d, &rt, timecode, importer, speed, phono, protect);
+    r = deck_init(d, &rt, timecode, importer, speed, phono, protect, ndeck);
     if (r == -1)
         return -1;
 
@@ -198,6 +202,10 @@ int main(int argc, char *argv[])
 
 #ifdef WITH_ALSA
     int alsa_buffer;
+#endif
+
+#ifdef WITH_OSC
+    bool use_osc;
 #endif
 
     fprintf(stderr, "%s\n\n" NOTICE "\n\n", banner);
@@ -233,6 +241,10 @@ int main(int argc, char *argv[])
 #ifdef WITH_OSS
     oss_fragment = DEFAULT_OSS_FRAGMENT;
     oss_buffers = DEFAULT_OSS_BUFFERS;
+#endif
+
+#ifdef WITH_OSC
+    use_osc = false;
 #endif
 
     /* Skip over command name */
@@ -572,6 +584,14 @@ int main(int argc, char *argv[])
             argc -= 2;
 #endif
 
+#ifdef WITH_OSC
+        } else if (!strcmp(argv[0], "--osc")) {
+            use_osc = true;
+
+            argv += 1;
+            argc -= 1;
+#endif
+
         } else {
             fprintf(stderr, "'%s' argument is unknown; try -h.\n", argv[0]);
             return -1;
@@ -589,6 +609,16 @@ int main(int argc, char *argv[])
     }
 
     rc = EXIT_FAILURE; /* until clean exit */
+
+#ifdef WITH_OSC
+    if (use_osc) {
+        if (osc_start((struct deck *)&deck, &library) == -1) {
+            fprintf(stderr, "Error starting osc server");
+            return -1;
+        }
+        osc_start_updater_thread(ndeck);
+    }
+#endif
 
     /* Order is important: launch realtime thread first, then mlock.
      * Don't mlock the interface, use sparingly for audio threads */
@@ -625,6 +655,11 @@ out_rt:
     library_clear(&library);
     rt_clear(&rt);
     rig_clear();
+#ifdef WITH_OSC
+    if (use_osc) {
+        osc_stop();
+    }
+#endif
     thread_global_clear();
 
     if (rc == EXIT_SUCCESS)
