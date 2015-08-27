@@ -46,14 +46,14 @@ static const struct record no_record = {
 
 int deck_init(struct deck *d, struct rt *rt,
               struct timecode_def *timecode, const char *importer,
-              double speed, bool phono, bool protect)
+              double speed, bool phono, bool protect, size_t ncontrol)
 {
     unsigned int rate;
 
     if (rt_add_device(rt, &d->device) == -1)
         return -1;
 
-    d->ncontrol = 0;
+    d->ncontrol = ncontrol;
     d->record = &no_record;
     d->punch = NO_PUNCH;
     d->protect = protect;
