@@ -98,6 +98,14 @@ OBJS += oss.o
 DEVICE_CPPFLAGS += -DWITH_OSS
 endif
 
+# OSC support?
+ifdef OSC
+LIBLO_LIBS ?= -llo
+LDLIBS += $(LIBLO_LIBS)
+OBJS += osc.o
+DEVICE_CPPFLAGS += -DWITH_OSC
+endif
+
 TEST_OBJS = $(addsuffix .o,$(TESTS))
 DEPS = $(OBJS:.o=.d) $(TEST_OBJS:.o=.d) mktimecode.d
 

@@ -70,10 +70,11 @@ void osc_add_deck()
     fprintf(stderr, "osc.c: osc_add_deck(): osc_ndeck: %i\n", osc_ndeck);
 }
 
-void osc_start_updater_thread()
+void osc_start_updater_thread(int ndeck)
 {
+    osc_ndeck = ndeck;
     pthread_create( &thread_osc_updater, NULL, osc_start_updater, (void*) NULL);
-    
+
     pthread_setschedprio(thread_osc_updater, 80);
 }
 
@@ -427,7 +428,7 @@ int pitch_handler(const char *path, const char *types, lo_arg ** argv,
     de = &osc_deck[argv[0]->i];
     pl = &de->player;
     
-    player_set_pitch(pl, argv[1]->f);
+    // player_set_pitch(pl, argv[1]->f);
 
     return 0;
 }
