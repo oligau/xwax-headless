@@ -39,38 +39,18 @@ int generic_handler(const char *path, const char *types, lo_arg ** argv,
                     int argc, void *data, void *user_data);
 int load_track_handler(const char *path, const char *types, lo_arg ** argv,
                 int argc, void *data, void *user_data);                      
-int set_cue_handler(const char *path, const char *types, lo_arg ** argv,
-                int argc, void *data, void *user_data);       
-int punch_cue_handler(const char *path, const char *types, lo_arg ** argv,
-                int argc, void *data, void *user_data); 
 int get_status_handler(const char *path, const char *types, lo_arg ** argv,
                 int argc, void *data, void *user_data);    
-int pitch_handler(const char *path, const char *types, lo_arg ** argv,
-                int argc, void *data, void *user_data);
 int recue_handler(const char *path, const char *types, lo_arg ** argv,
                 int argc, void *data, void *user_data); 
 int disconnect_handler(const char *path, const char *types, lo_arg ** argv,
                 int argc, void *data, void *user_data); 
 int reconnect_handler(const char *path, const char *types, lo_arg ** argv,
                 int argc, void *data, void *user_data);                 
-int connect_handler(const char *path, const char *types, lo_arg ** argv,
-                int argc, void *data, void *user_data);                
-int position_handler(const char *path, const char *types, lo_arg ** argv,
-                int argc, void *data, void *user_data);  
-int quit_handler(const char *path, const char *types, lo_arg ** argv,
-                 int argc, void *data, void *user_data);
 
 int osc_start(struct deck *deck, struct library *library);
 void osc_stop();
-void osc_add_deck();
 
-int osc_send_pos(int d, const float pos, const float pitch);
-int osc_send_track_load(struct deck *de);
-int osc_send_ppm_block(struct track *tr);
-int osc_send_scale(int scale);
 int osc_send_status(lo_address a, int d);
-
-void osc_start_updater_thread(int ndeck);
-void osc_start_updater();
 
 #endif
