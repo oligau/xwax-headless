@@ -621,7 +621,6 @@ int main(int argc, char *argv[])
             fprintf(stderr, "Error starting osc server");
             return -1;
         }
-        osc_start_updater_thread(ndeck);
     }
 #endif
 
