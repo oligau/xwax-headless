@@ -149,6 +149,10 @@ int load_track_handler(const char *path, const char *types, lo_arg ** argv,
     struct record *r;
 
     d = argv[0]->i;
+    if (d >= osc_ndeck) {
+        error(255, path, "Trying to access into invalid deck");
+        return 255;
+    }
     de = &osc_deck[d];
 
     r = malloc(sizeof *r);
@@ -185,6 +189,11 @@ int get_status_handler(const char *path, const char *types, lo_arg ** argv,
     fflush(stdout);
 
     int d = argv[0]->i;
+
+    if (d >= osc_ndeck) {
+        error(255, path, "Trying to access into invalid deck");
+        return 255;
+    }
 
     lo_address a = lo_message_get_source(data);
 
@@ -248,7 +257,14 @@ int disconnect_handler(const char *path, const char *types, lo_arg ** argv,
 
     struct deck *de;
     struct player *pl;
-    de = &osc_deck[argv[0]->i];
+    int d = argv[0]->i;
+
+    if (d >= osc_ndeck) {
+        error(255, path, "Trying to access into invalid deck");
+        return 255;
+    }
+
+    de = &osc_deck[d];
     pl = &de->player;
     pl->timecode_control = false;
     return 0;
@@ -266,7 +282,14 @@ int reconnect_handler(const char *path, const char *types, lo_arg ** argv,
 
     struct deck *de;
     struct player *pl;
-    de = &osc_deck[argv[0]->i];
+    int d = argv[0]->i;
+
+    if (d >= osc_ndeck) {
+        error(255, path, "Trying to access invalid deck");
+        return 255;
+    }
+
+    de = &osc_deck[d];
     pl = &de->player;
     pl->timecode_control = true;
     return 0;
@@ -283,7 +306,14 @@ int recue_handler(const char *path, const char *types, lo_arg ** argv,
     fflush(stdout);
 
     struct deck *de;
-    de = &osc_deck[argv[0]->i];
+    int d = argv[0]->i;
+
+    if (d >= osc_ndeck) {
+        error(255, path, "Trying to access invalid deck");
+        return 255;
+    }
+
+    de = &osc_deck[d];
 
     deck_recue(de);
 

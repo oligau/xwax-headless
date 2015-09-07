@@ -38,15 +38,15 @@ void error(int num, const char *m, const char *path);
 int generic_handler(const char *path, const char *types, lo_arg ** argv,
                     int argc, void *data, void *user_data);
 int load_track_handler(const char *path, const char *types, lo_arg ** argv,
-                int argc, void *data, void *user_data);                      
+                int argc, void *data, void *user_data);
 int get_status_handler(const char *path, const char *types, lo_arg ** argv,
-                int argc, void *data, void *user_data);    
+                int argc, void *data, void *user_data);
 int recue_handler(const char *path, const char *types, lo_arg ** argv,
-                int argc, void *data, void *user_data); 
+                int argc, void *data, void *user_data);
 int disconnect_handler(const char *path, const char *types, lo_arg ** argv,
-                int argc, void *data, void *user_data); 
+                int argc, void *data, void *user_data);
 int reconnect_handler(const char *path, const char *types, lo_arg ** argv,
-                int argc, void *data, void *user_data);                 
+                int argc, void *data, void *user_data);
 
 int osc_start(struct deck *deck, struct library *library);
 void osc_stop();
