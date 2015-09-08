@@ -134,7 +134,8 @@ static void usage(FILE *fd)
 
 #ifdef WITH_OSC
     fprintf(fd, "OSC support:\n"
-      "  --osc           Switch on open sound control\n\n");
+      "  --osc           Switch on open sound control\n"
+      "  --headless      Run in headless mode with out a graphical interface\n\n");
 #endif
 
     fprintf(fd,
@@ -212,6 +213,7 @@ int main(int argc, char *argv[])
 
 #ifdef WITH_OSC
     bool use_osc;
+    bool headless;
 #endif
 
     fprintf(stderr, "%s\n\n" NOTICE "\n\n", banner);
@@ -252,6 +254,7 @@ int main(int argc, char *argv[])
 
 #ifdef WITH_OSC
     use_osc = false;
+    headless = false;
 #endif
 
     /* Skip over command name */
@@ -353,8 +356,8 @@ int main(int argc, char *argv[])
 #endif
 
         } else if (!strcmp(argv[0], "-d") || !strcmp(argv[0], "-a") ||
-		  !strcmp(argv[0], "-j"))
-	{
+          !strcmp(argv[0], "-j"))
+    {
             int r;
             struct device *device;
 
@@ -604,6 +607,12 @@ int main(int argc, char *argv[])
 
             argv += 1;
             argc -= 1;
+
+        } else if (!strcmp(argv[0], "--headless")) {
+            headless = true;
+
+            argv += 1;
+            argc -= 1;
 #endif
 
         } else {
@@ -626,9 +635,11 @@ int main(int argc, char *argv[])
 
 #ifdef WITH_OSC
     if (use_osc) {
-        if (osc_start((struct deck *)&deck, &library) == -1) {
+        if (osc_start((struct deck *)&deck, &library, ndeck) == -1) {
             fprintf(stderr, "Error starting osc server");
             return -1;
+        } else {
+            fprintf(stderr, "Successfully started osc server\n");
         }
     }
 #endif
@@ -644,8 +655,14 @@ int main(int argc, char *argv[])
         goto out_rt;
     }
 
-    if (interface_start(&library, geo, decor) == -1)
-        goto out_rt;
+#ifdef WITH_OSC
+    if (!headless) {
+#endif
+        if (interface_start(&library, geo, decor) == -1)
+            goto out_rt;
+#ifdef WITH_OSC
+    }
+#endif
 
     if (rig_main() == -1)
         goto out_interface;
