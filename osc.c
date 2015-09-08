@@ -65,10 +65,11 @@ int osc_nclient = 0;
  * Start osc server and add methods
  */
 
-int osc_start(struct deck *deck, struct library *library)
+int osc_start(struct deck *deck, struct library *library, size_t ndeck)
 {
     osc_deck = deck;
     osc_library = library;
+    osc_ndeck = ndeck;
 
     /* why do we have two addresses here? They're both the same! */
     address[0] = lo_address_new_from_url("osc.udp://0.0.0.0:7771/");
