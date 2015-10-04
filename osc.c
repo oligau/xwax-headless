@@ -40,6 +40,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <signal.h>
 
 #include "osc.h"
 #include "player.h"
@@ -87,6 +88,8 @@ int osc_start(struct deck *deck, struct library *library, size_t ndeck)
     lo_server_thread_add_method(st, "/xwax/disconnect", "i", disconnect_handler, NULL);
 
     lo_server_thread_add_method(st, "/xwax/reconnect", "i", reconnect_handler, NULL);
+
+    lo_server_thread_add_method(st, "/xwax/quit", "", quit_handler, NULL);
 
     lo_server_thread_start(st);
 
@@ -151,6 +154,7 @@ int load_track_handler(const char *path, const char *types, lo_arg ** argv,
 
     d = argv[0]->i;
     if (d >= osc_ndeck) {
+        fprintf(stderr, "Trying to access deck %d\n  osc_ndeck = %d\n", d, osc_ndeck);
         error(255, path, "Trying to access into invalid deck");
         return 255;
     }
@@ -196,13 +200,17 @@ int get_status_handler(const char *path, const char *types, lo_arg ** argv,
         return 255;
     }
 
-    lo_address a = lo_message_get_source(data);
+    // lo_address a = lo_message_get_source(data);
+    lo_address a = lo_address_new("0.0.0.0", "7771");
+    printf("PORT: %s\n", lo_address_get_port(a));
 
     char* url = lo_address_get_url(a);
 
-    printf("%s\n", url);
+    printf("URL: %s\n", url);
 
     osc_send_status(a, d);
+
+    return 0;
 }
 
 /*
@@ -223,6 +231,8 @@ int osc_send_status(lo_address a, int d)
         path = tr->path;
     else
         path = "";
+
+    printf("PORT: %s\n", lo_address_get_port(a));
 
     if(tr) {
         /* send a message to /xwax/status */
@@ -319,4 +329,13 @@ int recue_handler(const char *path, const char *types, lo_arg ** argv,
     deck_recue(de);
 
     return 0;
+}
+
+/*
+ * quit handler
+ */
+int quit_handler(const char *path, const char *types, lo_arg ** argv, int argc, void *data, void *user_data)
+{
+    lo_server_thread_free(st);
+    raise(SIGINT);
 }
