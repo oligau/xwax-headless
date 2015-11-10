@@ -222,9 +222,11 @@ int osc_send_status(lo_address a, int d)
     struct deck *de;
     struct player *pl;
     struct track *tr;
+    struct timecoder *tc;
     de = &osc_deck[d];
     pl = &de->player;
     tr = pl->track;
+    tc = pl->timecoder;
 
     char *path;
     if(tr->path)
@@ -232,11 +234,24 @@ int osc_send_status(lo_address a, int d)
     else
         path = "";
 
+    char * mon;
+    int r, c, i=0;
+    mon = malloc((tc->mon_size+1)*tc->mon_size*sizeof(char));
+    for (r=0; r<tc->mon_size; r++) {
+        for (c=0; c<tc->mon_size; c++) {
+            if ((int)tc->mon[r * tc->mon_size + c] > 0)
+                mon[i++] = '1';
+            else
+                mon[i++] = '0';
+        }
+        mon[i++] = '\n';
+    }
+
     printf("PORT: %s\n", lo_address_get_port(a));
 
     if(tr) {
         /* send a message to /xwax/status */
-        if (lo_send(a, "/xwax/status", "isssfffi",
+        if (lo_send(a, "/xwax/status", "isssfffis",
                 de->ncontrol,           // deck number (int)
                 path,               // track path (string)
                 de->record->artist,     // artist name (string)
@@ -244,13 +259,16 @@ int osc_send_status(lo_address a, int d)
                 (float) tr->length / (float) tr->rate,  // track length in seconds (float)
                 player_get_elapsed(pl),           // player position in seconds (float)
                 pl->pitch,              // player pitch (float)
-                pl->timecode_control)    // timecode activated or not (int)
+                pl->timecode_control,    // timecode activated or not (int)
+                mon)  // timecode monitor
             == -1) {
             printf("OSC error %d: %s\n", lo_address_errno(a),
                    lo_address_errstr(a));
         }
         printf("osc_send_status: sent deck %i status to %s\n", d, lo_address_get_url(a));
     }
+
+    free(mon);
 
     return 0;
 }
@@ -338,4 +356,6 @@ int quit_handler(const char *path, const char *types, lo_arg ** argv, int argc, 
 {
     lo_server_thread_free(st);
     raise(SIGINT);
+
+    return 0;
 }

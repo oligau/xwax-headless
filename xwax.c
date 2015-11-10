@@ -652,6 +652,11 @@ int main(int argc, char *argv[])
         if (interface_start(&library, geo) == -1)
             goto out_rt;
 #ifdef WITH_OSC
+    } else {
+        for (n = 0; n < ndeck; n++) {
+            if (timecoder_monitor_init(&deck[n].timecoder, 50) == -1)
+                return -1;
+        }
     }
 #endif
 
