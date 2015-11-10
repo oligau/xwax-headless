@@ -13,7 +13,7 @@ rcvport = 7771
 def print_status(*args):
     print('Received status message:')
     names = ['deck number', 'track path', 'artist', 'title', 'song length',
-             'elapsed', 'pitch', 'control']
+             'elapsed', 'pitch', 'control', 'monitor']
     for lbl, v in zip(names, args[1]):
         print('  {}: {}'.format(lbl, v))
     print('End status message')
@@ -50,7 +50,7 @@ if __name__ == "__main__":
         osc_args = [args.player-1]
 
         server = liblo.ServerThread(rcvport)
-        server.add_method('/xwax/status', "isssfffi", print_status)
+        server.add_method('/xwax/status', "isssfffis", print_status)
         server.start()
     elif args.action in ['recue', 'disconnect', 'reconnect']:
         osc_address = '/xwax/{}'.format(args.action)
