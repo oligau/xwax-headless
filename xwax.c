@@ -658,7 +658,7 @@ int main(int argc, char *argv[])
 #ifdef WITH_OSC
     if (!headless) {
 #endif
-        if (interface_start(&library, geo) == -1)
+        if (interface_start(&library, geo, decor) == -1)
             goto out_rt;
 #ifdef WITH_OSC
     } else {
