@@ -5,7 +5,7 @@ import argparse
 from time import sleep
 
 deck = 0
-xwaxhost = 'riemann'
+xwaxhost = 'localhost'
 xwaxport = 7770
 rcvport = 7771
 
