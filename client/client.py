@@ -19,6 +19,10 @@ def print_status(*args):
     print('End status message')
 
 
+def print_monitor(*args):
+    print("Monitor:")
+    print(args[1][0])
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('action',
@@ -27,6 +31,7 @@ if __name__ == "__main__":
                                  'recue',
                                  'disconnect',
                                  'reconnect',
+                                 'monitor',
                                  'quit'],
                         help='What to do')
     parser.add_argument('player', choices=[1, 2], nargs='?', type=int,
@@ -50,7 +55,14 @@ if __name__ == "__main__":
         osc_args = [args.player-1]
 
         server = liblo.ServerThread(rcvport)
-        server.add_method('/xwax/status', "isssfffis", print_status)
+        server.add_method('/xwax/status', "isssfffi", print_status)
+        server.start()
+    elif args.action == 'monitor':
+        osc_address = '/xwax/get_monitor'
+        osc_args = [args.player-1]
+
+        server = liblo.ServerThread(rcvport)
+        server.add_method('/xwax/monitor', 's', print_monitor)
         server.start()
     elif args.action in ['recue', 'disconnect', 'reconnect']:
         osc_address = '/xwax/{}'.format(args.action)
@@ -65,6 +77,6 @@ if __name__ == "__main__":
     addr = liblo.Address(xwaxhost, xwaxport)       # This is where xwax is
     liblo.send(addr, msg)
 
-    if args.action == 'status':
+    if args.action in ['status', 'monitor']:
         sleep(.1)
         server.stop()
