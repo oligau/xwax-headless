@@ -41,6 +41,8 @@ int load_track_handler(const char *path, const char *types, lo_arg ** argv,
                 int argc, void *data, void *user_data);
 int get_status_handler(const char *path, const char *types, lo_arg ** argv,
                 int argc, void *data, void *user_data);
+int get_monitor_handler(const char *path, const char *types, lo_arg ** argv,
+                int argc, void *data, void *user_data);
 int recue_handler(const char *path, const char *types, lo_arg ** argv,
                 int argc, void *data, void *user_data);
 int disconnect_handler(const char *path, const char *types, lo_arg ** argv,
@@ -54,6 +56,7 @@ int osc_start(struct deck *deck, struct library *library, size_t ndeck);
 void osc_stop();
 
 int osc_send_status(lo_address a, int d);
+int osc_send_monitor(lo_address a, int d);
 
 
 #endif

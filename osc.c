@@ -83,6 +83,8 @@ int osc_start(struct deck *deck, struct library *library, size_t ndeck)
 
     lo_server_thread_add_method(st, "/xwax/get_status", "i", get_status_handler, NULL);
 
+    lo_server_thread_add_method(st, "/xwax/get_monitor", "i", get_monitor_handler, NULL);
+
     lo_server_thread_add_method(st, "/xwax/recue", "i", recue_handler, NULL);
 
     lo_server_thread_add_method(st, "/xwax/disconnect", "i", disconnect_handler, NULL);
@@ -213,6 +215,39 @@ int get_status_handler(const char *path, const char *types, lo_arg ** argv,
     return 0;
 }
 
+
+/*
+ * replies to get_monitor request calls by sending the status back
+ */
+
+
+int get_monitor_handler(const char *path, const char *types, lo_arg ** argv,
+                int argc, void *data, void *user_data)
+{
+    /* example showing pulling the argument values out of the argv array */
+    printf("%s <- deck:%i\n", path, argv[0]->i);
+    fflush(stdout);
+
+    int d = argv[0]->i;
+
+    if (d >= osc_ndeck) {
+        error(255, path, "Trying to access into invalid deck");
+        return 255;
+    }
+
+    // lo_address a = lo_message_get_source(data);
+    lo_address a = lo_address_new("0.0.0.0", "7771");
+    printf("PORT: %s\n", lo_address_get_port(a));
+
+    char* url = lo_address_get_url(a);
+
+    printf("URL: %s\n", url);
+
+    osc_send_monitor(a, d);
+
+    return 0;
+}
+
 /*
  * sent status message for deck d to /xwax/status
  */
@@ -234,6 +269,44 @@ int osc_send_status(lo_address a, int d)
     else
         path = "";
 
+    printf("PORT: %s\n", lo_address_get_port(a));
+
+    if(tr) {
+        /* send a message to /xwax/status */
+        if (lo_send(a, "/xwax/status", "isssfffi",
+                de->ncontrol,           // deck number (int)
+                path,               // track path (string)
+                de->record->artist,     // artist name (string)
+                de->record->title,      // track title (string)
+                (float) tr->length / (float) tr->rate,  // track length in seconds (float)
+                player_get_elapsed(pl),           // player position in seconds (float)
+                pl->pitch,              // player pitch (float)
+                pl->timecode_control)    // timecode activated or not (int)
+            == -1) {
+            printf("OSC error %d: %s\n", lo_address_errno(a),
+                   lo_address_errstr(a));
+        }
+        printf("osc_send_status: sent deck %i status to %s\n", d, lo_address_get_url(a));
+    }
+
+    return 0;
+}
+
+/*
+ * sent monitor message for deck d to /xwax/monitor
+ */
+
+int osc_send_monitor(lo_address a, int d)
+{
+    struct deck *de;
+    struct player *pl;
+    struct track *tr;
+    struct timecoder *tc;
+    de = &osc_deck[d];
+    pl = &de->player;
+    tr = pl->track;
+    tc = pl->timecoder;
+
     char * mon;
     int r, c, i=0;
     mon = malloc((tc->mon_size+1)*tc->mon_size*sizeof(char));
@@ -251,27 +324,19 @@ int osc_send_status(lo_address a, int d)
 
     if(tr) {
         /* send a message to /xwax/status */
-        if (lo_send(a, "/xwax/status", "isssfffis",
-                de->ncontrol,           // deck number (int)
-                path,               // track path (string)
-                de->record->artist,     // artist name (string)
-                de->record->title,      // track title (string)
-                (float) tr->length / (float) tr->rate,  // track length in seconds (float)
-                player_get_elapsed(pl),           // player position in seconds (float)
-                pl->pitch,              // player pitch (float)
-                pl->timecode_control,    // timecode activated or not (int)
-                mon)  // timecode monitor
-            == -1) {
+        if (lo_send(a, "/xwax/monitor", "s", mon) == -1) {
             printf("OSC error %d: %s\n", lo_address_errno(a),
                    lo_address_errstr(a));
         }
-        printf("osc_send_status: sent deck %i status to %s\n", d, lo_address_get_url(a));
+        printf("osc_send_monitor: sent deck %i monitor to %s\n", d, lo_address_get_url(a));
     }
 
     free(mon);
 
     return 0;
 }
+
+
 
 /*
  * Disconnect time code control
