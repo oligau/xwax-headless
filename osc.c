@@ -319,12 +319,13 @@ int osc_send_monitor(lo_address a, int d)
         }
         mon[i++] = '\n';
     }
+    mon[i++] = '\0';
 
     printf("PORT: %s\n", lo_address_get_port(a));
 
     if(tr) {
-        /* send a message to /xwax/status */
-        if (lo_send(a, "/xwax/monitor", "s", mon) == -1) {
+        /* send a message to /xwax/monitor */
+        if (lo_send(a, "/xwax/monitor", "is", d, mon) == -1) {
             printf("OSC error %d: %s\n", lo_address_errno(a),
                    lo_address_errstr(a));
         }
