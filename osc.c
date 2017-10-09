@@ -79,7 +79,7 @@ int osc_start(struct deck *deck, struct library *library, size_t ndeck)
     /* start a new server on port 7770 */
     st = lo_server_thread_new("7770", error);
 
-    lo_server_thread_add_method(st, "/xwax/load_track", "isss", load_track_handler, NULL);
+    lo_server_thread_add_method(st, "/xwax/load_track", "isssd", load_track_handler, NULL);
 
     lo_server_thread_add_method(st, "/xwax/get_status", "i", get_status_handler, NULL);
 
@@ -146,8 +146,8 @@ int load_track_handler(const char *path, const char *types, lo_arg ** argv,
                 int argc, void *data, void *user_data)
 {
     /* example showing pulling the argument values out of the argv array */
-    fprintf(stderr, "%s <- deck:%i path:%s artist:%s title:%s\n",
-            path, argv[0]->i, &argv[1]->s, &argv[2]->s, &argv[3]->s);
+    fprintf(stderr, "%s <- deck:%i path:%s artist:%s title:%s bpm:%g\n",
+            path, argv[0]->i, &argv[1]->s, &argv[2]->s, &argv[3]->s, argv[4]->d);
     fflush(stderr);
 
     int d;
@@ -170,7 +170,8 @@ int load_track_handler(const char *path, const char *types, lo_arg ** argv,
 
     r->pathname = strdup(&argv[1]->s);
     r->artist = strdup(&argv[2]->s);
-    r->title = strdup(&argv[3]->s);  
+    r->title = strdup(&argv[3]->s);
+    r->bpm = (double) argv[4]->d;
 
     r = library_add(osc_library, r);
     if (r == NULL) {
