@@ -150,9 +150,12 @@ int load_track_handler(const char *path, const char *types, lo_arg ** argv,
             path, argv[0]->i, &argv[1]->s, &argv[2]->s, &argv[3]->s, argv[4]->d);
     fflush(stderr);
 
-    int d;
+    int d, i;
     struct deck *de;
     struct record *r;
+	struct listing storage;
+	bool success = false;
+    char * pathname = strdup(&argv[1]->s);
 
     d = argv[0]->i;
     if (d >= osc_ndeck) {
@@ -162,12 +165,17 @@ int load_track_handler(const char *path, const char *types, lo_arg ** argv,
     }
     de = &osc_deck[d];
 
+	/*
     r = malloc(sizeof *r);
     if (r == NULL) {
         perror("malloc");
         return -1;
     }
 
+	// One could try to find the record by pathname and only load if it already exists library->storage->by_artist->record->pathname
+	// Loading the entire library doesn't take long and this would fix the obvious memory leak
+	// BUT: the problem typically seems to come up when trying to access a "track" rather than a "record"
+	// track contains more audio like information
     r->pathname = strdup(&argv[1]->s);
     r->artist = strdup(&argv[2]->s);
     r->title = strdup(&argv[3]->s);
@@ -175,11 +183,29 @@ int load_track_handler(const char *path, const char *types, lo_arg ** argv,
 
     r = library_add(osc_library, r);
     if (r == NULL) {
-        /* FIXME: memory leak, need to do record_clear(r) */
+        // FIXME: memory leak, need to do record_clear(r)
         return -1;
     }
+	*/
 
-    deck_load(&osc_deck[d], r);
+
+	storage = osc_library->storage;
+	for (i=0; i<storage.by_artist.entries; i++) {
+		r = storage.by_artist.record[i];
+		if (strcmp(pathname, r->pathname) == 0) {
+			success = true;
+			break;
+		}
+	}
+
+	if (r == NULL) {
+		return -1;
+	}
+	if (success) {
+		deck_load(&osc_deck[d], r);
+	} else {
+		fprintf(stderr, "Error loading path %s", pathname);
+	}
 
 
     return 0;
