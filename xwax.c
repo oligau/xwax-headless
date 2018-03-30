@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Mark Hills <mark@xwax.org>
+ * Copyright (C) 2018 Mark Hills <mark@xwax.org>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,6 +18,7 @@
  */
 
 #include <assert.h>
+#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -61,7 +62,7 @@
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(*x))
 
 char *banner = "xwax " VERSION \
-    " (C) Copyright 2015 Mark Hills <mark@xwax.org>";
+    " (C) Copyright 2018 Mark Hills <mark@xwax.org>";
 
 size_t ndeck;
 struct deck deck[3];
@@ -218,7 +219,14 @@ int main(int argc, char *argv[])
 
     fprintf(stderr, "%s\n\n" NOTICE "\n\n", banner);
 
+    if (setlocale(LC_ALL, "") == NULL) {
+        fprintf(stderr, "Could not honour the local encoding\n");
+        return -1;
+    }
+
     if (thread_global_init() == -1)
+        return -1;
+    if (library_global_init() == -1)
         return -1;
 
     if (rig_init() == -1)
@@ -695,6 +703,7 @@ out_rt:
         osc_stop();
     }
 #endif
+    library_global_clear();
     thread_global_clear();
 
     if (rc == EXIT_SUCCESS)

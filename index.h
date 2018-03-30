@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Mark Hills <mark@xwax.org>
+ * Copyright (C) 2018 Mark Hills <mark@xwax.org>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,8 +27,16 @@
 #define SORT_PLAYLIST 2
 #define SORT_END      3
 
+/* A single music track in our listings */
+
 struct record {
-    char *pathname, *artist, *title;
+    char *pathname, *artist, *title; /* a single malloc */
+
+    /* An optional extra string may be used to match against search
+     * input; allows us to handle locale but still type in ASCII */
+
+    char *match; /* or NULL */
+
     double bpm; /* or 0.0 if not known */
 };
 

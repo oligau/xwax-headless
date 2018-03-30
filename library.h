@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Mark Hills <mark@xwax.org>
+ * Copyright (C) 2018 Mark Hills <mark@xwax.org>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -55,6 +55,9 @@ struct library {
     struct crate all, **crate;
     size_t crates;
 };
+
+int library_global_init(void);
+void library_global_clear(void);
 
 void listing_init(struct listing *l);
 void listing_clear(struct listing *l);
