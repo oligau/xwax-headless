@@ -37,9 +37,9 @@ if __name__ == "__main__":
     parser.add_argument('player', choices=[1, 2], nargs='?', type=int,
                         help='Which player')
     parser.add_argument('filename', nargs='?', default=None, help='Which file')
-    parser.add_argument('-H', '--host', default='localhost',
+    parser.add_argument('-H', '--host', default=xwaxhost,
                         help='Hostname at which xwax is running')
-    parser.add_argument('-p', '--port', type=int, default=7770,
+    parser.add_argument('-p', '--port', type=int, default=xwaxport,
                         help='Port at which xwax is listening')
 
     args = parser.parse_args()
@@ -74,9 +74,11 @@ if __name__ == "__main__":
         raise ValueError('This should never happen')
 
     msg = liblo.Message(osc_address, *osc_args)
-    addr = liblo.Address(xwaxhost, xwaxport)       # This is where xwax is
+    addr = liblo.Address(args.host, args.port)       # This is where xwax is
     liblo.send(addr, msg)
 
     if args.action in ['status', 'monitor']:
-        sleep(.1)
+        if args.host != 'localhost':
+            print('Warning: xwax currently sends response to localhost, so UDP traffic may need to be redirected')
+        sleep(.4)
         server.stop()
