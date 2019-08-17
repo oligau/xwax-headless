@@ -48,8 +48,8 @@ if __name__ == "__main__":
 
     if args.action == 'load':
         osc_address = '/xwax/load_track'
-        # FIXME get title and artist from file
-        osc_args = [args.player-1, args.filename, 'Afu-Ra', 'Defeat (Redio)']
+        # FIXME get title and artist and BPM from file
+        osc_args = [args.player-1, args.filename, 'Artist', 'Title', 0.0]
     elif args.action == 'status':
         osc_address = '/xwax/get_status'
         osc_args = [args.player-1]
