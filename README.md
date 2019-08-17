@@ -27,8 +27,8 @@ sudo apt-get install mpg123 liblo-dev python-liblo
 #### 3. Fetch xwax osc branch code
 
 ```
-git clone https://github.com/igordertigor/xwax.git
-cd xwax
+git clone https://github.com/oligau/xwax-headless.git
+cd xwax-headless
 git checkout osc
 ```
 
