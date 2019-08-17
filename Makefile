@@ -27,6 +27,7 @@ SDL_CFLAGS ?= `sdl-config --cflags`
 SDL_LIBS ?= `sdl-config --libs` -lSDL_ttf
 ALSA_LIBS ?= -lasound
 JACK_LIBS ?= -ljack
+LIBLO_LIBS ?= -llo
 
 # Installation paths
 
@@ -100,10 +101,9 @@ endif
 
 # OSC support?
 ifdef OSC
-LIBLO_LIBS ?= -llo
-LDLIBS += $(LIBLO_LIBS)
 OBJS += osc.o
 DEVICE_CPPFLAGS += -DWITH_OSC
+DEVICE_LIBS += $(LIBLO_LIBS)
 endif
 
 TEST_OBJS = $(addsuffix .o,$(TESTS))
