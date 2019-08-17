@@ -62,6 +62,7 @@ void player_set_internal_playback(struct player *pl);
 void player_set_track(struct player *pl, struct track *track);
 void player_clone(struct player *pl, const struct player *from);
 
+void player_set_pitch(struct player *pl, const float pitch);
 double player_get_position(struct player *pl);
 double player_get_elapsed(struct player *pl);
 double player_get_remain(struct player *pl);

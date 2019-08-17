@@ -27,6 +27,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('action',
                         choices=['load',
+								 'set-pitch',
                                  'status',
                                  'recue',
                                  'disconnect',
@@ -37,6 +38,7 @@ if __name__ == "__main__":
     parser.add_argument('player', choices=[1, 2], nargs='?', type=int,
                         help='Which player')
     parser.add_argument('filename', nargs='?', default=None, help='Which file')
+    parser.add_argument('--pitch', nargs='?',type=float, default=None, help='Pitch to set. i.e. 0.0 stop, 1.0 playing 1x, 1.5 playing 1.5x')
     parser.add_argument('-H', '--host', default=xwaxhost,
                         help='Hostname at which xwax is running')
     parser.add_argument('-p', '--port', type=int, default=xwaxport,
@@ -45,11 +47,16 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.action == 'load' and args.filename is None:
         parser.parse_args(['--help'])
+    if args.action == 'set-pitch' and args.pitch is None:
+        parser.parse_args(['--help'])
 
     if args.action == 'load':
         osc_address = '/xwax/load_track'
         # FIXME get title and artist and BPM from file
         osc_args = [args.player-1, args.filename, 'Artist', 'Title', 0.0]
+    elif args.action == 'set-pitch':
+        osc_address = '/xwax/set_pitch'
+        osc_args = [args.player-1, args.pitch]        
     elif args.action == 'status':
         osc_address = '/xwax/get_status'
         osc_args = [args.player-1]

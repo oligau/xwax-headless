@@ -254,6 +254,12 @@ bool player_toggle_timecode_control(struct player *pl)
     return pl->timecode_control;
 }
 
+void player_set_pitch(struct player *pl, const float pitch)
+{
+    pl->timecode_control = false;
+    pl->pitch = pitch;
+}
+
 void player_set_internal_playback(struct player *pl)
 {
     pl->timecode_control = false;

@@ -39,6 +39,8 @@ int generic_handler(const char *path, const char *types, lo_arg ** argv,
                     int argc, void *data, void *user_data);
 int load_track_handler(const char *path, const char *types, lo_arg ** argv,
                 int argc, void *data, void *user_data);
+int set_pitch_handler(const char *path, const char *types, lo_arg ** argv,
+                int argc, void *data, void *user_data);                
 int get_status_handler(const char *path, const char *types, lo_arg ** argv,
                 int argc, void *data, void *user_data);
 int get_monitor_handler(const char *path, const char *types, lo_arg ** argv,

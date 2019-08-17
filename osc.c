@@ -81,6 +81,8 @@ int osc_start(struct deck *deck, struct library *library, size_t ndeck)
 
     lo_server_thread_add_method(st, "/xwax/load_track", "isssd", load_track_handler, NULL);
 
+    lo_server_thread_add_method(st, "/xwax/set_pitch", "if", set_pitch_handler, NULL);
+
     lo_server_thread_add_method(st, "/xwax/get_status", "i", get_status_handler, NULL);
 
     lo_server_thread_add_method(st, "/xwax/get_monitor", "i", get_monitor_handler, NULL);
@@ -151,7 +153,7 @@ int load_track_handler(const char *path, const char *types, lo_arg ** argv,
     fflush(stderr);
 
     int d, i;
-    struct deck *de;
+    //struct deck *de;
     struct record *r;
 	struct listing storage;
 	bool success = false;
@@ -163,7 +165,8 @@ int load_track_handler(const char *path, const char *types, lo_arg ** argv,
         error(255, path, "Trying to access into invalid deck");
         return 255;
     }
-    de = &osc_deck[d];
+    //de = &osc_deck[d];
+
 
 	/*
     r = malloc(sizeof *r);
@@ -207,6 +210,30 @@ int load_track_handler(const char *path, const char *types, lo_arg ** argv,
 		fprintf(stderr, "Error loading path %s", pathname);
 	}
 
+
+    return 0;
+}
+
+int set_pitch_handler(const char *path, const char *types, lo_arg ** argv,
+                int argc, void *data, void *user_data)
+{
+    /* example showing pulling the argument values out of the argv array */
+    printf("%s <- deck:%i\n", path, argv[0]->i);
+    fflush(stdout);
+    
+    int d = argv[0]->i;
+
+    if (d >= osc_ndeck) {
+        error(255, path, "Trying to access into invalid deck");
+        return 255;
+    }    
+    
+    struct deck *de;
+    struct player *pl;
+    de = &osc_deck[argv[0]->i];
+    pl = &de->player;
+    
+    player_set_pitch(pl, argv[1]->f);
 
     return 0;
 }
@@ -284,11 +311,11 @@ int osc_send_status(lo_address a, int d)
     struct deck *de;
     struct player *pl;
     struct track *tr;
-    struct timecoder *tc;
+    // struct timecoder *tc;
     de = &osc_deck[d];
     pl = &de->player;
     tr = pl->track;
-    tc = pl->timecoder;
+    // tc = pl->timecoder;
 
     char *path;
     if(tr->path)
